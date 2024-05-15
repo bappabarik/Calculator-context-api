@@ -1,12 +1,31 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCalculator } from './Contexts/CalContext'
 import Display from './Components/Display'
 import Buttons from './Components/Buttons'
 
 function App() {
-    const { calculateResult, removeDigits } = useCalculator()
+    const { expression, calculateResult, removeDigits, handleInput, clearExpression } = useCalculator()
     
+    useEffect(() => {
+      const handleKeyPress = (event) => {
+        const { key } = event
+        if(!isNaN(key) || key === '.' || ['+', '-', '*', '/', '%', '(', ')'].includes(key)){
+          handleInput(key)
+        } else if (key === "Enter"){
+          calculateResult()
+        } else if(key === "Escape"){
+          clearExpression()
+        } else if( key === "Backspace"){
+          removeDigits()
+        }
+      }
+
+      window.addEventListener('keydown', handleKeyPress)
+      return () => {
+        window.removeEventListener('keydown', handleKeyPress)
+      };
+    }, [expression, calculateResult, removeDigits, handleInput, clearExpression]);   
 
   return (
       <div className=" flex flex-col justify-center items-center p-8 gap-2 w-full h-screen bg-slate-800">
